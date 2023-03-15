@@ -1,0 +1,869 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyM5mBu0XSUHfjdi1T7AdeJp",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/sherki99/GoFinance_one/blob/master/deeplearning%20module.lesson%201%20\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "###My Data Preprocessing Templete\n",
+        "Step 1: Importing libraries "
+      ],
+      "metadata": {
+        "id": "3TYWU4Ya_L7c"
+      }
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 9,
+      "metadata": {
+        "id": "n2hsGsb1_FJ5"
+      },
+      "outputs": [],
+      "source": [
+        "import tensorflow as tf\n",
+        "import pandas as pd \n",
+        "import csv\n",
+        "import numpy as np\n",
+        " "
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "###Step 2: Import Data"
+      ],
+      "metadata": {
+        "id": "YbI6-swWBBo-"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "x  = []\n",
+        "y = []\n",
+        "\n",
+        "\n",
+        "with open(\"/content/PracticeData (1).csv\") as csvfile: \n",
+        "\n",
+        "\n",
+        "  csv_f = csv.reader(csvfile, delimiter =  \",\")\n",
+        "\n",
+        "  next(csv_f)\n",
+        "\n",
+        "  for row in csv_f: \n",
+        "\n",
+        "    x.append(row[0: -1])\n",
+        "    y.append(row[-1])\n",
+        "\n",
+        "print(x[:2])\n",
+        "print(y[:2])\n",
+        "\n",
+        "\n",
+        "y = np.array(y)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "SuqvtSAY_yvE",
+        "outputId": "e2859a30-2d31-47b7-ea01-07e1b62e26e9"
+      },
+      "execution_count": 11,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "[['15624510', 'Male', '19', '19000'], ['15810944', 'Male', '35', '20000']]\n",
+            "['0', '0']\n",
+            "['0' '0']\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "## second way of redigna csv file\n",
+        "data = pd.read_csv(r\"/content/PracticeData (1).csv\")\n",
+        "df = pd.DataFrame(data, columns=[\"User ID\", \"Gender\", \"Age\" , \"EstimatedSalary\", \"Purchased\"])\n",
+        "print(df)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "kwhV3Sq6E_Lc",
+        "outputId": "371f013d-d6dc-4764-ad90-d3d430ce8765"
+      },
+      "execution_count": 121,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "      User ID  Gender   Age  EstimatedSalary  Purchased\n",
+            "0    15624510    Male  19.0          19000.0        0.0\n",
+            "1    15810944    Male  35.0          20000.0        0.0\n",
+            "2    15668575  Female  26.0          43000.0        0.0\n",
+            "3    15603246  Female  27.0          57000.0        0.0\n",
+            "4    15804002    Male  19.0          76000.0        0.0\n",
+            "..        ...     ...   ...              ...        ...\n",
+            "395  15691863  Female  46.0          41000.0        1.0\n",
+            "396  15706071    Male  51.0          23000.0        1.0\n",
+            "397  15654296  Female  50.0          20000.0        1.0\n",
+            "398  15755018    Male  36.0          33000.0        0.0\n",
+            "399  15594041  Female  49.0              NaN        1.0\n",
+            "\n",
+            "[400 rows x 5 columns]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "### Step 3: Deal with missing values \n"
+      ],
+      "metadata": {
+        "id": "K08s-f6vBEx8"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "## number of missing value  in the row in all columnt \n",
+        "df.isnull().sum() \n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "-pZxhJbJBWrv",
+        "outputId": "2c2b3705-63c4-4d1d-c30a-c2cd2e02c63f"
+      },
+      "execution_count": 122,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "User ID             0\n",
+              "Gender              0\n",
+              "Age                17\n",
+              "EstimatedSalary    21\n",
+              "Purchased           7\n",
+              "dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 122
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df1 = df.dropna(axis = 1)\n",
+        "print(df1)\n",
+        "## drop all the culumn the have at least one null valu "
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "g3pr5gZ4BWo8",
+        "outputId": "817a6e53-a5cb-4a4e-8ada-18d8989f2298"
+      },
+      "execution_count": 123,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "      User ID  Gender\n",
+            "0    15624510    Male\n",
+            "1    15810944    Male\n",
+            "2    15668575  Female\n",
+            "3    15603246  Female\n",
+            "4    15804002    Male\n",
+            "..        ...     ...\n",
+            "395  15691863  Female\n",
+            "396  15706071    Male\n",
+            "397  15654296  Female\n",
+            "398  15755018    Male\n",
+            "399  15594041  Female\n",
+            "\n",
+            "[400 rows x 2 columns]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = df.dropna(axis = 0) ## axis  = 0 if i want to delete hte row axis = 1the columt that have missing value\n",
+        "print(df)\n",
+        "df.isnull().sum()\n",
+        "\n",
+        "\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "wLDKFSsUBWg1",
+        "outputId": "9867a554-3786-4322-81f6-6e7e5f67f0f1"
+      },
+      "execution_count": 124,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "      User ID  Gender   Age  EstimatedSalary  Purchased\n",
+            "0    15624510    Male  19.0          19000.0        0.0\n",
+            "1    15810944    Male  35.0          20000.0        0.0\n",
+            "2    15668575  Female  26.0          43000.0        0.0\n",
+            "3    15603246  Female  27.0          57000.0        0.0\n",
+            "4    15804002    Male  19.0          76000.0        0.0\n",
+            "..        ...     ...   ...              ...        ...\n",
+            "394  15757632  Female  39.0          59000.0        0.0\n",
+            "395  15691863  Female  46.0          41000.0        1.0\n",
+            "396  15706071    Male  51.0          23000.0        1.0\n",
+            "397  15654296  Female  50.0          20000.0        1.0\n",
+            "398  15755018    Male  36.0          33000.0        0.0\n",
+            "\n",
+            "[356 rows x 5 columns]\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "User ID            0\n",
+              "Gender             0\n",
+              "Age                0\n",
+              "EstimatedSalary    0\n",
+              "Purchased          0\n",
+              "dtype: int64"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 124
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "x = df.iloc[:, :-1]\n",
+        "y = df.iloc[:,-1]\n",
+        "print(x)\n",
+        "print(y)\n",
+        "x = x.astype(str)\n",
+        "y  =y.astype(str)\n",
+        "x1 = np.array(x)\n",
+        "y1 = np.array(y).reshape(-1, 1)\n",
+        "\n",
+        "\n",
+        "print(x1)\n",
+        "print(y1)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "vZydwuZOLp0s",
+        "outputId": "35e6afde-2f99-469a-bcfc-2e1c4e682763"
+      },
+      "execution_count": 125,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "      User ID  Gender   Age  EstimatedSalary\n",
+            "0    15624510    Male  19.0          19000.0\n",
+            "1    15810944    Male  35.0          20000.0\n",
+            "2    15668575  Female  26.0          43000.0\n",
+            "3    15603246  Female  27.0          57000.0\n",
+            "4    15804002    Male  19.0          76000.0\n",
+            "..        ...     ...   ...              ...\n",
+            "394  15757632  Female  39.0          59000.0\n",
+            "395  15691863  Female  46.0          41000.0\n",
+            "396  15706071    Male  51.0          23000.0\n",
+            "397  15654296  Female  50.0          20000.0\n",
+            "398  15755018    Male  36.0          33000.0\n",
+            "\n",
+            "[356 rows x 4 columns]\n",
+            "0      0.0\n",
+            "1      0.0\n",
+            "2      0.0\n",
+            "3      0.0\n",
+            "4      0.0\n",
+            "      ... \n",
+            "394    0.0\n",
+            "395    1.0\n",
+            "396    1.0\n",
+            "397    1.0\n",
+            "398    0.0\n",
+            "Name: Purchased, Length: 356, dtype: float64\n",
+            "[['15624510' 'Male' '19.0' '19000.0']\n",
+            " ['15810944' 'Male' '35.0' '20000.0']\n",
+            " ['15668575' 'Female' '26.0' '43000.0']\n",
+            " ...\n",
+            " ['15706071' 'Male' '51.0' '23000.0']\n",
+            " ['15654296' 'Female' '50.0' '20000.0']\n",
+            " ['15755018' 'Male' '36.0' '33000.0']]\n",
+            "[['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['1.0']\n",
+            " ['0.0']]\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [],
+      "metadata": {
+        "id": "T2NTW595BWGl"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "###Step 4: Data encoding\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "an0zTIgABN89"
+      }
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "\n",
+        "\n",
+        "\n",
+        "Machine learning algorithms and deep learning neural networks require that input and output variables are numbers.\n",
+        "\n",
+        "This means that categorical data must be encoded to numbers before we can use it to fit and evaluate a model.\n",
+        "\n",
+        "There are many ways to encode categorical variables for modeling, although the three most common are as follows:\n",
+        "\n",
+        "Integer Encoding: Where each unique label is mapped to an integer.\n",
+        "\n",
+        "One Hot Encoding: Where each label is mapped to a binary vector.\n",
+        "\n",
+        "Learned Embedding: Where a distributed representation of the categories is learned."
+      ],
+      "metadata": {
+        "id": "aBpITfFyI8T0"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from sklearn.preprocessing import OneHotEncoder\n",
+        "# A one hot encoding is appropriate for categorical data where no relationship exists between categories.\n",
+        "ohe = OneHotEncoder()\n",
+        "ohe.fit(x1)\n",
+        "x4 = ohe.transform(x1)\n",
+        "ohe.fit(y1)\n",
+        "y4 =ohe.transform(y1)\n",
+        "\n",
+        "## in teoria con lesempio che swguito prima facico train test split poiu encdoff so go down and check my freind\n",
+        "## or maybe no\n",
+        "\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "Jmoan1pBBbr8"
+      },
+      "execution_count": 126,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "185c77ajViJ0"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "###Step 5: Split the data into test and train sets "
+      ],
+      "metadata": {
+        "id": "_8AuSL7wBcaU"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from sklearn.model_selection import train_test_split \n",
+        "x_train, x_test , y_train , y_test = train_test_split(x4, y4, test_size = 0.3, random_state = 1)\n"
+      ],
+      "metadata": {
+        "id": "cdfSuGJIBfbt"
+      },
+      "execution_count": 127,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "print(x_train.shape)\n",
+        "print(y_train.shape)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "YPqt3eLWib_i",
+        "outputId": "52ac8726-d43a-44b5-c4d7-b9da2d3d0bf8"
+      },
+      "execution_count": 128,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "(249, 515)\n",
+            "(249, 2)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "###Step 6: Data scaling"
+      ],
+      "metadata": {
+        "id": "RJG7cqxuBjm9"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "\n",
+        "model = tf.keras.models.Sequential([\n",
+        "    tf.keras.layers.Dense(64, activation = \"relu\"),\n",
+        "    tf.keras.layers.Dense(32, activation = \"relu\"),\n",
+        "    tf.keras.layers.Dense(1, activation = \"sigmoid\")\n",
+        "])\n"
+      ],
+      "metadata": {
+        "id": "hYGjx0juBjRM"
+      },
+      "execution_count": 129,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "model.compile(loss = 'binary_crossentropy', optimizer='adam', metrics=['accuracy'])"
+      ],
+      "metadata": {
+        "id": "tdgTGuDVkUiS"
+      },
+      "execution_count": 133,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "##model.fit(x_train, y_train, epochs = 10 )"
+      ],
+      "metadata": {
+        "id": "eeTe8vZ9knsL"
+      },
+      "execution_count": 136,
+      "outputs": []
+    }
+  ]
+}
